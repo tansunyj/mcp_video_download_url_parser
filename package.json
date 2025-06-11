@@ -1,19 +1,31 @@
 {
   "name": "mcp_video_download_url_parser",
   "version": "1.0.0",
+  "module": "index.js",
   "description": "A service for extracting and downloading video and audio from provided URLs.",
   "type": "module",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start:dist": "node dist/index.js",
+    "clean": "if exist dist rmdir /s /q dist",
+    "copy-files": "xcopy /s /i src\\*.js dist\\",
+    "build": "npm run clean && mkdir dist && npm run copy-files",
+    "prebuild": "echo Preparing build...",
+    "type":"package.json"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
     "axios": "^0.21.4",
     "cheerio": "^1.1.0",
     "express": "^4.21.2",
     "form-data": "^4.0.3",
     "jsdom": "^26.1.0",
     "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^5.0.1"
   },
   "author": "",
   "license": "ISC"
