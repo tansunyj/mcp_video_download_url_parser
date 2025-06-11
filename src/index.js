@@ -23,30 +23,48 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
+const VERSION = "1.0.0";
+
 async function startServer() {
   try {
+    // Create MCP server instance
     const server = new McpServer({
       name: 'video-downloader-mcp',
-      version: '1.0.0',
-      handlers: {
-        'video-download-url-parser': async (context) => {
-          try {
-            const { videoUrl } = context.request.body;
-            const result = await fetchVideoData(videoUrl);
-            return {
-              success: true,
-              data: result
-            };
-          } catch (error) {
-            return {
-              success: false,
-              error: error.message
-            };
+      version: VERSION
+    });
+
+    // Register video download tool
+    server.tool({
+      name: 'video-download-url-parser',
+      description: 'Extract video download information from URL',
+      parameters: {
+        type: 'object',
+        properties: {
+          videoUrl: {
+            type: 'string',
+            description: 'URL of the video to process'
           }
+        },
+        required: ['videoUrl']
+      },
+      handler: async (context) => {
+        try {
+          const { videoUrl } = context.parameters;
+          const result = await fetchVideoData(videoUrl);
+          return {
+            success: true,
+            data: result
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error.message
+          };
         }
       }
     });
 
+    // Connect using stdio transport
     await server.connect(new StdioServerTransport());
     console.log('MCP Server started successfully');
   } catch (error) {
@@ -55,4 +73,8 @@ async function startServer() {
   }
 }
 
-startServer();
+// Start the server
+startServer().catch(error => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});
