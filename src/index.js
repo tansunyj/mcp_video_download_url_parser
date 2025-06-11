@@ -4,6 +4,8 @@ import express from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { fetchVideoData } from './services/videoService.js';
+import { z } from 'zod';
+import { extractUrlFromText } from './utils/textParser.js';
 
 const app = express();
 app.use(express.json());
@@ -34,35 +36,59 @@ async function startServer() {
     });
 
     // Register video download tool
-    server.tool({
-      name: 'video-download-url-parser',
-      description: 'Extract video download information from URL',
-      parameters: {
-        type: 'object',
-        properties: {
-          videoUrl: {
-            type: 'string',
-            description: 'URL of the video to process'
-          }
-        },
-        required: ['videoUrl']
+    server.tool(
+      'video-download-url-parser',
+      '从文本中提取视频URL并获取下载信息，支持多种清晰度和音频提取。',
+      {
+        videoUrl: z.string().describe('包含视频URL的文本。可以是一段话中包含视频链接，例如："我看到一个很好的视频 https://www.youtube.com/watch?v=example 希望下载下来"')
       },
-      handler: async (context) => {
+      async ({ videoUrl }) => {
         try {
-          const { videoUrl } = context.parameters;
-          const result = await fetchVideoData(videoUrl);
+          // Extract URL from input text
+          const extractedUrl = extractUrlFromText(videoUrl);
+          if (!extractedUrl) {
+            return {
+              content: [
+                {
+                  type: 'json',
+                  data: {
+                    success: false,
+                    error: '未能从输入文本中找到有效的视频URL'
+                  }
+                }
+              ]
+            };
+          }
+
+          const result = await fetchVideoData(extractedUrl);
           return {
-            success: true,
-            data: result
+            content: [
+              {
+                type: 'json',
+                data: {
+                  success: true,
+                  originalText: videoUrl,
+                  extractedUrl: extractedUrl,
+                  data: result
+                }
+              }
+            ]
           };
         } catch (error) {
           return {
-            success: false,
-            error: error.message
+            content: [
+              {
+                type: 'json',
+                data: {
+                  success: false,
+                  error: error.message
+                }
+              }
+            ]
           };
         }
       }
-    });
+    );
 
     // Connect using stdio transport
     await server.connect(new StdioServerTransport());
