@@ -30,12 +30,13 @@ mcp-service
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/tansunyj/mcp_video_download_url_parser.git
+
    ```
 
 2. Navigate to the project directory:
    ```
-   cd mcp-service
+      cd mcp_video_download_url_parser
    ```
 
 3. Install the dependencies:
@@ -45,7 +46,7 @@ mcp-service
 
 4. Run the application:
    ```
-   node src/index.js
+   node dist/index.js
    ```
 
 ## Usage
@@ -61,11 +62,10 @@ To use this service in MCP-compatible tools, use the following configuration:
 {
   "mcpServers": {
     "video-downloader-mcp": {
-      "command": "cmd.exe",
+      "command": "npm",
       "args": [
-        "/c",
         "node",
-        "dist/index.js"
+        "./dist/index.js"
       ]
     }
   }
