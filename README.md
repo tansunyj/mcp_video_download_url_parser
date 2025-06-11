@@ -50,8 +50,37 @@ mcp-service
 
 ## Usage
 
+### Local Development
 - Input a video URL and any additional text when prompted.
 - The service will process the input and provide options for downloading the video or audio.
+
+### MCP Configuration
+To use this service in MCP-compatible tools, use the following configuration:
+
+```json
+{
+  "mcpServers": {
+    "video-downloader-mcp": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "node",
+        "dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+#### Configuration Details
+- `video-downloader-mcp`: The unique identifier for this MCP service
+- `command`: Specifies the shell to use (cmd.exe for Windows)
+- `args`: Command line arguments to start the service
+  - `/c`: Tells cmd.exe to execute the command and terminate
+  - `node`: The Node.js runtime
+  - `dist/index.js`: The compiled service entry point
+
+Note: Make sure to run `npm run build` before using the MCP configuration to ensure the dist folder contains the latest code.
 
 ## License
 
