@@ -41,10 +41,12 @@ npx -y @smithery/cli install @tansunyj/mcp_video_download_url_parser --client cl
 {
     "mcpServers": {
         "video-url-parser": {
-            "command": "ux",
+            "command": "uv",
             "args": [
-                "run"
-                "/path/to/mcp_video_download_url_parser/main.py"
+                "--directory",
+                "/path/to/mcp_video_download_url_parser",
+                "run",
+                "main.py"
             ]
         }
     }
